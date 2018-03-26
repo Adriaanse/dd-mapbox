@@ -140,9 +140,69 @@ Then on the first line of the file main.js add the following:
     import 'babel-polyfill'
 ```
 
-12. Inside then v-mapbox element in App.vue, add search and navigation controls, with the following markup:
+12. Inside the v-mapbox element in App.vue, you can add navigation controls with the following markup:
 
 ```
-      <v-mapbox-geocoder></v-mapbox-geocoder>
-      <v-mapbox-navigation-control></v-mapbox-navigation-control>
+    <v-mapbox-navigation-control></v-mapbox-navigation-control>
+```
+
+13. Define a list of DD api sources in a seperate file named apisources.js:
+
+```
+    const apisources = [
+      {
+        'id': 'aquadesk',
+        'baseurl': 'http://digitaldelta.aquadesk.nl'
+      },
+      {
+        'id': 'lizard',
+        'baseurl': 'https://hhnk.lizard.net/dd/api/v1'
+      },
+      {
+        'id': 'fews',
+        'baseurl': 'http://tl-tc097.xtr.deltares.nl:8080/FewsWebServices/rest/digitaledelta/v1/'
+      }]
+
+    export {
+      apisources
+    }
+```
+
+14. Now in the App.vuew file, inside the v-toolbar element, add a v-select component providing a list of api sources as follows:
+```
+    <v-toolbar app>
+      <v-flex xs4 pt-4 pl-2>
+        <v-select name="sourceselect" v-model="selected" v-bind:items="urls" overflow label="Digital Delta Nodes"/>
+      </v-flex>
+    </v-toolbar>
+```
+
+In the linked javascript file app-vue.js, import the data sources add the "selected" and "selection" properties, resulting in the following code:
+
+```
+// api sources digitale delta
+import {
+  apisources
+} from './apisources.js'
+
+    // app instance
+    export default {
+      data () {
+        return {
+        selected: ''
+        }
+      },
+      computed: {
+        selection: function () {
+          var ids = []
+          apisources.forEach((src) => {
+            ids.push(src.id)
+          })
+          return ids
+        }
+    },
+    name: 'App',
+    components: {
+    }
+    }
 ```

@@ -1,6 +1,10 @@
 <template>
     <v-app>
-      <v-toolbar app></v-toolbar>
+    <v-toolbar app>
+      <v-flex xs4 pt-4 pl-2>
+        <v-select name="sourceselect" v-model="selected" v-bind:items="selection" overflow label="Digital Delta Nodes"/>
+      </v-flex>
+    </v-toolbar>
       <v-content>
         <v-mapbox 
           access-token="pk.eyJ1IjoiYWRyaWFhbnNlIiwiYSI6ImNqYXd4YnZ5dzc4dzMycW53b3lhMXZ6eDkifQ.bbG-PKhVspm-Mkh9zhO8hQ"
@@ -11,7 +15,6 @@
           :bearing="0"
           id="map"
           ref="map">
-          <v-mapbox-geocoder></v-mapbox-geocoder>
           <v-mapbox-navigation-control></v-mapbox-navigation-control>
         </v-mapbox>
       </v-content>
