@@ -139,3 +139,10 @@ Then on the first line of the file main.js add the following:
     // Required to work on MSIE 11
     import 'babel-polyfill'
 ```
+
+12. Inside then v-mapbox element in App.vue, add search and navigation controls, with the following markup:
+
+```
+      <v-mapbox-geocoder></v-mapbox-geocoder>
+      <v-mapbox-navigation-control></v-mapbox-navigation-control>
+```

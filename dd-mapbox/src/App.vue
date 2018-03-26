@@ -11,6 +11,8 @@
           :bearing="0"
           id="map"
           ref="map">
+          <v-mapbox-geocoder></v-mapbox-geocoder>
+          <v-mapbox-navigation-control></v-mapbox-navigation-control>
         </v-mapbox>
       </v-content>
       <v-footer app></v-footer>
