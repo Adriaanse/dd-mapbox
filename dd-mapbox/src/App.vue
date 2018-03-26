@@ -17,18 +17,7 @@
     </v-app>
 </template>
 
-<script>
-export default {
-  data () {
-    return {
-
-    }
-  },
-  name: 'App',
-  components: {
-  }
-}
-</script>
+<script src="./app-vue.js"></script>
 
 <style >
   @import 'mapbox-gl/dist/mapbox-gl.css';
