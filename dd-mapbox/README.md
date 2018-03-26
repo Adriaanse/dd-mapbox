@@ -127,3 +127,15 @@ Also you can delete src/components/HelloWorld.vue and src/assets/logo.png
 Now run the project (you can just keep the 'npm run dev' development server running and see it hot-load your changes into chrome) and see if the Map of the Netherlands is displayed:
 
 ![Map](images/netherlands.png)
+
+11. If you try to open localhost:8080 on Microsoft Internet Explorer you wil find that it does not work, which can be easily fixed with the babel polyfill. In your project folder at the command prompt, run the following:
+
+```
+    npm install --save babel-polyfill
+```
+Then on the first line of the file main.js add the following:
+
+```
+    // Required to work on MSIE 11
+    import 'babel-polyfill'
+```
