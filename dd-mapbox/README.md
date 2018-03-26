@@ -41,7 +41,7 @@ You may want to read a little about VueJS, Vuetify and WebPack before you contin
 
 Using Google Chrome as your web browser is strongly recommended as there are specific Vue extensions for the Chrome developer tools (you will be prompted to install them in chrome) and some code editors like VS Code can use the Chrome developers tools to further improve the debugging experience.
 
-5. Now use your editor to open the file src/components/HelloWorld.vue then change the text on line 7 to 'Hello world" and if you still have your browser open you will see the text displayed in your browser displayed almost immediately after you save the file, this 'hot-loading' is a typical feature of WebPack.
+5. Now use your editor to open the file src/components/HelloWorld.vue then change the text on line 7 to 'Hello world' and if you still have your browser open you will see the text displayed in your browser displayed almost immediately after you save the file, this 'hot-loading' is a typical feature of WebPack.
 
 6. Go back to the command prompt running in the dd-mapbox folder to install the vue2mapbox-gl Vue component that was published by Deltares:
     
@@ -180,29 +180,179 @@ Then on the first line of the file main.js add the following:
 In the linked javascript file app-vue.js, import the data sources add the "selected" and "selection" properties, resulting in the following code:
 
 ```
-// api sources digitale delta
-import {
-  apisources
-} from './apisources.js'
+    // api sources digitale delta
+    import {
+      apisources
+    } from './apisources.js'
 
     // app instance
     export default {
       data () {
         return {
         selected: ''
-        }
-      },
-      computed: {
-        selection: function () {
-          var ids = []
-          apisources.forEach((src) => {
-            ids.push(src.id)
-          })
-          return ids
-        }
+      }
     },
-    name: 'App',
-    components: {
-    }
+    computed: {
+      selection: function () {
+        var ids = []
+        apisources.forEach((src) => {
+          ids.push(src.id)
+        })
+        return ids
+      }
+    },
+      name: 'App',
+      components: {
+      }
     }
 ```
+
+15. To define a map layer styling for each api source add a new file apilayers.js containing the following code:
+
+```
+    const apilayers = [
+      {
+        'id': 'aquadesk',
+        'type': 'circle',
+        'minzoom': 5,
+        'paint': {
+          'circle-radius': 8
+        }
+      },
+      {
+        'id': 'lizard',
+        'type': 'circle',
+        'minzoom': 5,
+        'paint': {
+          'circle-radius': 8
+        }
+      },
+      {
+        'id': 'fews',
+        'type': 'circle',
+        'minzoom': 5,
+        'paint': {
+          'circle-radius': 8
+        }
+      }
+    ]
+
+    export {
+      apilayers
+    }
+```
+
+Then import this into app-vue.js:
+
+```
+    import {
+      apilayers
+    } from './apilayers.js'
+```
+
+16. In app-vue.js below the "selected" property of the app instance we define an object to hold layer data once it has been loaded:
+
+```
+    data () {
+      return {
+        selected: ''
+        layer: {}
+      }
+    },
+
+```
+
+Then a little further down, below "computed: { ... }," and above the name property enter the following code to define a 'watcher' and a (placeholder) method to be called to add a layer for the selected source:
+
+```
+    watch: {
+      selected (newSource, oldSource) {
+        if (oldSource) {
+          this.$refs.map.map.setLayoutProperty(oldSource, 'visibility', 'none')
+        }
+        if (this.layer[newSource]) {
+          this.$refs.map.map.setLayoutProperty(newSource, 'visibility', 'visible')
+        } else {
+          this.addLayer(newSource)
+        }
+      }
+
+    },
+    methods: {
+      addLayer (id) {
+        console.log('todo: add layer: ' + id)
+      }
+    },
+```
+You should now see the "todo:" message in the javascript console when selecting a source in the toolbar above the map.
+
+17. Now to load the layer data using the javascript Fetch API and add it as GeoJSON layer to the map, further expand the AddLayer method as follows:
+
+```
+    methods: {
+      addLayer (id) {
+        // load api data and add it as layer to the map
+        var url = apisources.find(s => s.id === id).baseurl
+        fetch(url + '/locations?pagesize=100000')
+        .then((resp) => resp.json())
+        .then((data) => {
+          var layer = apilayers.find(l => l.id === id)
+          layer.source = parseLayerData(data.results)
+          this.$refs.map.map.addLayer(layer)
+          this.layer[id] = layer
+        })
+        .catch(function (err) {
+          console.log('error loading data: ' + err)
+        })
+      }
+    },
+
+```
+
+Then at the very bottom of the app-vue.js file add the following method for parsing the api source data into a suitable format for MapBox:
+
+```
+    function parseLayerData (apidata) {
+      // re-format the api data to geojson
+      var geojsonarray = []
+      apidata.forEach((item) => {
+        geojsonarray.push({
+          'type': 'Feature',
+          'geometry': item.geometry,
+          'properties': {
+            'uuid': item.uuid,
+            'url': item.url,
+            'code': item.code,
+            'name': item.name
+          }
+        })
+      })
+      // MapBox data source format
+      var source = {
+        'type': 'geojson',
+        'data': {
+          'type': 'FeatureCollection',
+          'features': geojsonarray
+        }
+      }
+      return source
+    }
+```
+
+18. To add more functionality some event handlers etc. need to be setup when the app starts up and has initialized the page and loaded components, in the app-vue.js file at the end of the app instance definitions, add the following code just behind the empty components: section:
+
+```
+    components: {
+    },
+    mounted () {
+      this.$nextTick(() => {
+        this.map = this.$refs.map.map
+      })
+    }
+```
+
+The nextTick event is raised by vue after the initial page content has been rendered and the defined components can be addressed.
+We set a this.map shortcut to provide quick access to the MapBox GL component inside the v-mapbox element.
+
+Now in app-vue ja, find the other references to this.$refs.map.map and replace them by this.map.
+
