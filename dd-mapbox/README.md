@@ -298,8 +298,8 @@ You should now see the "todo:" message in the javascript console when selecting 
         .then((data) => {
           var layer = apilayers.find(l => l.id === id)
           layer.source = parseLayerData(data.results)
-          this.$refs.map.map.addLayer(layer)
           this.layer[id] = layer
+          this.map.addLayer(layer)
         })
         .catch(function (err) {
           console.log('error loading data: ' + err)
@@ -354,5 +354,51 @@ Then at the very bottom of the app-vue.js file add the following method for pars
 The nextTick event is raised by vue after the initial page content has been rendered and the defined components can be addressed.
 We set a this.map shortcut to provide quick access to the MapBox GL component inside the v-mapbox element.
 
-Now in app-vue ja, find the other references to this.$refs.map.map and replace them by this.map.
+Now in app-vue.js, find the other references to this.$refs.map.map and replace them by this.map.
+
+19. To add a pop-up when the mouse hovers over a location in the loaded layer, add the following code in the mounted() event handler:
+
+```
+    // MapBox popup, for later use
+    this.map.popup = new mapboxgl.Popup({
+      closeButton: false,
+    })
+```
+
+Inside the App instance code block you should try not to add too much code, put logic in separate functions at the end of the file instead so just below the map.addLayer call, add one line:
+
+```
+    this.map.addLayer(layer)
+    setupLayerEvents(this.map, layer)
+```
+
+Then at the end of the app-vue.js file, add the following:
+
+```
+    function setupLayerEvents (map, layer) {
+      // when the mouse enters a feature of a layer
+      map.on('mouseenter', layer.id, (e) => {
+        // change cursor to a pointer and show popup with information
+        map.getCanvas().style.cursor = 'pointer'
+        map.popup.setLngLat(e.lngLat)
+          .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
+          .addTo(map)
+      })
+      // when mouse leaves a layer
+      map.on('mouseleave', layer.id, () => {
+        // cursors changes back to default and Popup is removed
+        map.getCanvas().style.cursor = ''
+        map.popup.remove()
+      })
+    }
+```
+
+Now if you test the app you should see a popup appear whenever the mouse hovers over a location in the selected layer.]
+
+20. The final task is also the most complex one, when a location is selected, the api source needs to be called to get a list of parameters to select from, and on selection of a parameter the api source needs to be called again to retrieve a time series which is to be presented in a graphic plot using BokehJS
+
+The choice is made to popup a (modal) Vuetify dialog for this interaction and in order to separate the layout markup and logic for this a new component can be created, so in the src/components folder we create a new component, name the file v-data-dialog.vue and put the following markup there to start with a dropdown list and close button:
+
+
+
 
