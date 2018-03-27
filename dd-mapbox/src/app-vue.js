@@ -98,7 +98,11 @@ function parseLayerData (apidata) {
 }
 
 function setupLayerEvents (map, layer) {
+<<<<<<< HEAD
   // when the mouse enters a feature of a layer
+=======
+  // setup map box event handlers
+>>>>>>> 7f461bee64b66cc0a32ac0dd691664f8737bc2a1
   map.on('mouseenter', layer.id, (e) => {
     // change cursor to a pointer and show popup with information
     map.getCanvas().style.cursor = 'pointer'
@@ -106,9 +110,14 @@ function setupLayerEvents (map, layer) {
       .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
       .addTo(map)
   })
+<<<<<<< HEAD
   // when mouse leaves a layer
   map.on('mouseleave', layer.id, () => {
     // cursors changes back to default and popup is removed
+=======
+  map.on('mouseleave', layer.id, () => {
+    // cursors changes back to default and Popup is removed
+>>>>>>> 7f461bee64b66cc0a32ac0dd691664f8737bc2a1
     map.getCanvas().style.cursor = ''
     map.popup.remove()
   })
