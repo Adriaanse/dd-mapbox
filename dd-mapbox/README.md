@@ -376,11 +376,7 @@ Then at the end of the app-vue.js file, add the following:
 
 ```
     function setupLayerEvents (map, layer) {
-<<<<<<< HEAD
       // when the mouse enters a feature of a layer
-=======
-      // setup map box event handlers
->>>>>>> 7f461bee64b66cc0a32ac0dd691664f8737bc2a1
       map.on('mouseenter', layer.id, (e) => {
         // change cursor to a pointer and show popup with information
         map.getCanvas().style.cursor = 'pointer'
@@ -388,10 +384,7 @@ Then at the end of the app-vue.js file, add the following:
           .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
           .addTo(map)
       })
-<<<<<<< HEAD
       // when mouse leaves a layer
-=======
->>>>>>> 7f461bee64b66cc0a32ac0dd691664f8737bc2a1
       map.on('mouseleave', layer.id, () => {
         // cursors changes back to default and Popup is removed
         map.getCanvas().style.cursor = ''
@@ -400,7 +393,6 @@ Then at the end of the app-vue.js file, add the following:
     }
 ```
 
-<<<<<<< HEAD
 Now if you test the app you should see a popup appear whenever the mouse hovers over a location in the selected layer.]
 
 20. The final task is also the most complex one, when a location is selected, the api source needs to be called to get a list of parameters to select from, and on selection of a parameter the api source needs to be called again to retrieve a time series which is to be presented in a graphic plot using BokehJS
@@ -409,7 +401,4 @@ The choice is made to popup a (modal) Vuetify dialog for this interaction and in
 
 
 
-=======
-Now if you test the app[ you should see a popup appear whenever the mouse hovers over a location in the selected layer.]
->>>>>>> 7f461bee64b66cc0a32ac0dd691664f8737bc2a1
 
