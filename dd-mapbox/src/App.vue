@@ -17,6 +17,7 @@
           ref="map">
           <v-mapbox-navigation-control></v-mapbox-navigation-control>
         </v-mapbox>
+        <data-dialog :visible="showDataDialog" @close="showDataDialog=false"></data-dialog>
       </v-content>
       <v-footer app></v-footer>
     </v-app>
@@ -27,7 +28,7 @@
 <style >
   @import 'mapbox-gl/dist/mapbox-gl.css';
   #map {
-  height: 100%;
-  width: 100%;
+    height: 100%;
+    width: 100%;
   }
 </style>

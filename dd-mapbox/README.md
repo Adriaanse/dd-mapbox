@@ -100,8 +100,8 @@ Then at the bottom of the App.Vue file add:
     <style >
       @import 'mapbox-gl/dist/mapbox-gl.css';
       #map {
-      height: 100%;
-      width: 100%;
+        height: 100%;
+        width: 100%;
       }
     </style>
 ```
@@ -266,6 +266,7 @@ Then a little further down, below "computed: { ... }," and above the name proper
 
 ```
     watch: {
+      // handle selection of an api source
       selected (newSource, oldSource) {
         if (oldSource) {
           this.$refs.map.map.setLayoutProperty(oldSource, 'visibility', 'none')
@@ -380,8 +381,9 @@ Then at the end of the app-vue.js file, add the following:
       map.on('mouseenter', layer.id, (e) => {
         // change cursor to a pointer and show popup with information
         map.getCanvas().style.cursor = 'pointer'
+        var props = e.features[0].properties
         map.popup.setLngLat(e.lngLat)
-          .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
+          .setHTML('Location: ' + props.name + ' (Code: ' + props.code + ')')
           .addTo(map)
       })
       // when mouse leaves a layer
@@ -395,10 +397,62 @@ Then at the end of the app-vue.js file, add the following:
 
 Now if you test the app you should see a popup appear whenever the mouse hovers over a location in the selected layer.]
 
-20. The final task is also the most complex one, when a location is selected, the api source needs to be called to get a list of parameters to select from, and on selection of a parameter the api source needs to be called again to retrieve a time series which is to be presented in a graphic plot using BokehJS
+20. When a location is selected, the api source needs to be called to get a list of parameters to select from, and on selection of a parameter the api source needs to be called again to retrieve a time series which is to be presented in a graphic plot using BokehJS
 
-The choice is made to popup a (modal) Vuetify dialog for this interaction and in order to separate the layout markup and logic for this a new component can be created, so in the src/components folder we create a new component, name the file v-data-dialog.vue and put the following markup there to start with a dropdown list and close button:
+The choice is made to popup a (modal) Vuetify dialog for this interaction and in order to separate the layout markup and logic for this a new component can be created, so in the src/components folder we create a new component, name the file data-dialog.vue and put the following markup there to start with a title, content area and close button:
 
+```
+    <template>
+    <v-dialog v-model="visible" max-width="500px">
+      <v-card>
+        <v-card-title>Title goes here</v-card-title>
+        <v-card-text>Dialog content goes here</v-card-text>
+        <v-card-actions>
+          <v-btn @click.stop="$emit('close')">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    </template>
 
+    <script>
+    export default {
+      props: ['visible']
+    }
+    </script>
+```
 
+Now in the file app-vue.js we need to import the dialog and add it to the components list, first at the top of the app-vue.js file just below the imports for apisource and apilayers, add the following:
 
+```
+    // components
+    import DataDialog from './components/data-dialog'
+```
+
+Then in the app instance code block, the empty components definition is already there, add the data dialog component like this:
+
+```
+    components: {
+        'data-dialog': DataDialog
+      },
+```
+
+The visibility of the dialog will be bound to an app instance property so add a showDataDialog property to the export default data block like this:
+
+```
+  data () {
+    return {
+      selected: '',
+      layer: {},
+      showDataDialog: true   // for testing
+    }
+  },
+
+```
+
+To actually show the dialog now that it has been defined, add it to the markup in the App.vue file, inside the v-content tag, just below the v-mapbox closing tag:
+
+```
+    <data-dialog :visible="showDataDialog" @close="showDataDialog=false"></data-dialog>
+```
+
+You should now see the mostly empty dialog when starting the app, and are able to close it by clicking the 'close' button.
