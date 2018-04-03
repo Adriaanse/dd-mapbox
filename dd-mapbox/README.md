@@ -140,11 +140,27 @@ Then on the first line of the file main.js add the following:
     import 'babel-polyfill'
 ```
 
-12. Inside the v-mapbox element in App.vue, you can add navigation controls with the following markup:
+12. Inside the v-mapbox element in App.vue, you can add navigation and geocoding (search) controls with the following markup:
 
 ```
+    <v-mapbox-geocoder></v-mapbox-geocoder>
     <v-mapbox-navigation-control></v-mapbox-navigation-control>
+    
 ```
+
+The geocoding feature requires and additional dependency which was not installed with the vue2mapbox-gl package, so on the command prompt you need to run:
+
+```
+    npm install --save @mapbox/mapbox-gl-geocoder
+```
+
+Then in the App.Vue file an additional css file needs to be loaded in the style section at the bottom:
+
+```
+    @import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+```
+
+You should now see a search field in the upper right corner of the map where you can search for place names.
 
 13. Define a list of DD api sources in a seperate file named apisources.js:
 

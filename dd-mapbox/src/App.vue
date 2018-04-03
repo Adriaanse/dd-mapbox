@@ -15,6 +15,7 @@
           :bearing="0"
           id="map"
           ref="map">
+          <v-mapbox-geocoder></v-mapbox-geocoder>
           <v-mapbox-navigation-control></v-mapbox-navigation-control>
         </v-mapbox>
       </v-content>
@@ -26,6 +27,7 @@
 
 <style >
   @import 'mapbox-gl/dist/mapbox-gl.css';
+  @import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
   #map {
   height: 100%;
   width: 100%;

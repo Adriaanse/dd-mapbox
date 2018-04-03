@@ -7,6 +7,7 @@ import Vue from 'vue'
 import App from './App'
 import Vuetify from 'vuetify'
 import Vue2MapboxGL from 'vue2mapbox-gl'
+
 import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify)
