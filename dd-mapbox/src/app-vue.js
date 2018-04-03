@@ -9,16 +9,12 @@ import {
   apilayers
 } from './apilayers.js'
 
-// components
-import DataDialog from './components/data-dialog'
-
 // app instance
 export default {
   data () {
     return {
       selected: '',
-      layer: {},
-      showDataDialog: true   // for testing
+      layer: {}
     }
   },
   computed: {
@@ -31,7 +27,6 @@ export default {
     }
   },
   watch: {
-    // handle selection of an api source
     selected (newSource, oldSource) {
       if (oldSource) {
         this.map.setLayoutProperty(oldSource, 'visibility', 'none')
@@ -64,7 +59,6 @@ export default {
   },
   name: 'App',
   components: {
-    'data-dialog': DataDialog
   },
   mounted () {
     this.$nextTick(() => {
@@ -108,9 +102,8 @@ function setupLayerEvents (map, layer) {
   map.on('mouseenter', layer.id, (e) => {
     // change cursor to a pointer and show popup with information
     map.getCanvas().style.cursor = 'pointer'
-    var props = e.features[0].properties
     map.popup.setLngLat(e.lngLat)
-      .setHTML('Location: ' + props.name + ' (Code: ' + props.code + ')')
+      .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
       .addTo(map)
   })
   // when mouse leaves a layer
