@@ -43,7 +43,7 @@ export default {
     addLayer (id) {
       // load api data and add it as layer to the map
       var url = apisources.find(s => s.id === id).baseurl
-      fetch(url + '/locations?pagesize=100000')
+      fetch(url + '/locations?format=json&pagesize=1000000')
       .then((resp) => resp.json())
       .then((data) => {
         var layer = apilayers.find(l => l.id === id)
