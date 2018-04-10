@@ -23,7 +23,7 @@
     </v-app>
 </template>
 
-<script src="./app-vue.js"></script>
+<script src="./app.js"></script>
 
 <style >
   @import 'mapbox-gl/dist/mapbox-gl.css';

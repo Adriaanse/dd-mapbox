@@ -106,7 +106,7 @@ Then at the bottom of the App.Vue file add:
     </style>
 ```
 
-10. Now that most of the default layout markup from the Vuetify template and the `HelloWorld` component are no longer used, cleanup the project a bit, in the App.Vuew file, clean up the `<script>` section, so that only this remains:
+10. Now that most of the default layout markup from the Vuetify template and the `HelloWorld` component are no longer used, cleanup the project a bit, in the App.Vue file, clean up the `<script>` section, so that only this remains:
 
 ```
     <script>
@@ -128,7 +128,21 @@ Now run the project (you can just keep the 'npm run dev' development server runn
 
 ![Map](images/netherlands.png)
 
-11. If you try to open localhost:8080 on Microsoft Internet Explorer you wil find that it does not work, which can be easily fixed with the babel polyfill. In your project folder at the command prompt, run the following:
+11. As the amount of javascript added to the App.vue grows, it will soon becom more practical to move the Javascript to a separate file, in this case app.js.
+
+To do this, move the Javascript inside the script tag from Vue.js into a separate App.js file and refer to this from the App.vue file by reducing the existing script tag to the following:
+
+```
+    <script src="./app.js"></script>
+```
+
+At this point Vue may have trouble loading the App.vue file and related app.js file properly, so you need to change how it is loaded in main.js to the following:
+
+'''
+    import App from './App.vue'
+'''
+
+12. If you try to open localhost:8080 on Microsoft Internet Explorer you wil find that it does not work, which can be easily fixed with the babel polyfill. In your project folder at the command prompt, run the following:
 
 ```
     npm install --save babel-polyfill
@@ -140,7 +154,7 @@ Then on the first line of the file main.js add the following:
     import 'babel-polyfill'
 ```
 
-12. Inside the v-mapbox element in App.vue, you can add navigation and geocoding (search) controls with the following markup:
+13. Inside the v-mapbox element in App.vue, you can add navigation and geocoding (search) controls with the following markup:
 
 ```
     <v-mapbox-geocoder></v-mapbox-geocoder>
@@ -162,7 +176,7 @@ Then in the App.Vue file an additional css file needs to be loaded in the style 
 
 You should now see a search field in the upper right corner of the map where you can search for place names.
 
-13. Define a list of DD api sources in a seperate file named apisources.js:
+14. Define a list of DD api sources in a seperate file named apisources.js:
 
 ```
     const apisources = [
@@ -173,10 +187,6 @@ You should now see a search field in the upper right corner of the map where you
       {
         'id': 'lizard',
         'baseurl': 'https://hhnk.lizard.net/dd/api/v1'
-      },
-      {
-        'id': 'fews',
-        'baseurl': 'http://tl-tc097.xtr.deltares.nl:8080/FewsWebServices/rest/digitaledelta/v1/'
       }]
 
     export {
@@ -184,7 +194,7 @@ You should now see a search field in the upper right corner of the map where you
     }
 ```
 
-14. Now in the App.vuew file, inside the v-toolbar element, add a v-select component providing a list of api sources as follows:
+15. Now in the App.vue file, inside the v-toolbar element, add a v-select component providing a list of api sources as follows:
 ```
     <v-toolbar app>
       <v-flex xs4 pt-4 pl-2>
@@ -193,7 +203,7 @@ You should now see a search field in the upper right corner of the map where you
     </v-toolbar>
 ```
 
-In the linked javascript file app-vue.js, import the data sources add the "selected" and "selection" properties, resulting in the following code:
+In the linked javascript file app.js, import the data sources add the "selected" and "selection" properties, resulting in the following code:
 
 ```
     // api sources digitale delta
@@ -223,7 +233,7 @@ In the linked javascript file app-vue.js, import the data sources add the "selec
     }
 ```
 
-15. To define a map layer styling for each api source add a new file apilayers.js containing the following code:
+16. To define a map layer styling for each api source add a new file apilayers.js containing the following code:
 
 ```
     const apilayers = [
@@ -258,7 +268,7 @@ In the linked javascript file app-vue.js, import the data sources add the "selec
     }
 ```
 
-Then import this into app-vue.js:
+Then import this into app.js:
 
 ```
     import {
@@ -266,7 +276,7 @@ Then import this into app-vue.js:
     } from './apilayers.js'
 ```
 
-16. In app-vue.js below the "selected" property of the app instance we define an object to hold layer data once it has been loaded:
+17. In app.js below the "selected" property of the app instance we define an object to hold layer data once it has been loaded:
 
 ```
     data () {
@@ -302,7 +312,7 @@ Then a little further down, below "computed: { ... }," and above the name proper
 ```
 You should now see the "todo:" message in the javascript console when selecting a source in the toolbar above the map.
 
-17. Now to load the layer data using the javascript Fetch API and add it as GeoJSON layer to the map, further expand the AddLayer method as follows:
+18. Now to load the layer data using the javascript Fetch API and add it as GeoJSON layer to the map, further expand the AddLayer method as follows:
 
 ```
     methods: {
@@ -325,7 +335,7 @@ You should now see the "todo:" message in the javascript console when selecting 
 
 ```
 
-Then at the very bottom of the app-vue.js file add the following method for parsing the api source data into a suitable format for MapBox:
+Then at the very bottom of the app.js file add the following method for parsing the api source data into a suitable format for MapBox:
 
 ```
     function parseLayerData (apidata) {
@@ -355,7 +365,7 @@ Then at the very bottom of the app-vue.js file add the following method for pars
     }
 ```
 
-18. To add more functionality some event handlers etc. need to be setup when the app starts up and has initialized the page and loaded components, in the app-vue.js file at the end of the app instance definitions, add the following code just behind the empty components: section:
+19. To add more functionality some event handlers etc. need to be setup when the app starts up and has initialized the page and loaded components, in the app.js file at the end of the app instance definitions, add the following code just behind the empty components: section:
 
 ```
     components: {
@@ -370,9 +380,9 @@ Then at the very bottom of the app-vue.js file add the following method for pars
 The nextTick event is raised by vue after the initial page content has been rendered and the defined components can be addressed.
 We set a this.map shortcut to provide quick access to the MapBox GL component inside the v-mapbox element.
 
-Now in app-vue.js, find the other references to this.$refs.map.map and replace them by this.map.
+Now in app.js, find the other references to this.$refs.map.map and replace them by this.map.
 
-19. To add a pop-up when the mouse hovers over a location in the loaded layer, add the following code in the mounted() event handler:
+20. To add a pop-up when the mouse hovers over a location in the loaded layer, add the following code in the mounted() event handler:
 
 ```
     // MapBox popup, for later use
@@ -388,7 +398,7 @@ Inside the App instance code block you should try not to add too much code, put 
     setupLayerEvents(this.map, layer)
 ```
 
-Then at the end of the app-vue.js file, add the following:
+Then at the end of the app.js file, add the following:
 
 ```
     function setupLayerEvents (map, layer) {
@@ -411,10 +421,7 @@ Then at the end of the app-vue.js file, add the following:
 
 Now if you test the app you should see a popup appear whenever the mouse hovers over a location in the selected layer.]
 
-20. The final task is also the most complex one, when a location is selected, the api source needs to be called to get a list of parameters to select from, and on selection of a parameter the api source needs to be called again to retrieve a time series which is to be presented in a graphic plot using BokehJS
-
-The choice is made to popup a (modal) Vuetify dialog for this interaction and in order to separate the layout markup and logic for this a new component can be created, so in the src/components folder we create a new component, name the file v-data-dialog.vue and put the following markup there to start with a dropdown list and close button:
-
+21. 
 
 
 
