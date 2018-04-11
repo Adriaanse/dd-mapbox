@@ -2,7 +2,7 @@
     <v-app>
     <v-toolbar app>
       <v-flex xs4 pt-4 pl-2>
-        <v-select name="sourceselect" v-model="selected" v-bind:items="selection" overflow label="Digital Delta Nodes"/>
+        <v-select name="sourceselect" v-model="source" v-bind:items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
       </v-flex>
     </v-toolbar>
       <v-content>

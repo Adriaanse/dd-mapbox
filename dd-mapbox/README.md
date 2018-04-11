@@ -198,12 +198,12 @@ You should now see a search field in the upper right corner of the map where you
 ```
     <v-toolbar app>
       <v-flex xs4 pt-4 pl-2>
-        <v-select name="sourceselect" v-model="selected" v-bind:items="urls" overflow label="Digital Delta Nodes"/>
+        <v-select name="sourceselect" v-model="source" v-bind:items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
       </v-flex>
     </v-toolbar>
 ```
 
-In the linked javascript file app.js, import the data sources add the "selected" and "selection" properties, resulting in the following code:
+In the linked javascript file app.js, import the api data sources and add the "sources" and "source" properties, resulting in the following code:
 
 ```
     // api sources digitale delta
@@ -215,21 +215,13 @@ In the linked javascript file app.js, import the data sources add the "selected"
     export default {
       data () {
         return {
-        selected: ''
+          sources: apisources,
+          source: ''
+        }
       }
     },
-    computed: {
-      selection: function () {
-        var ids = []
-        apisources.forEach((src) => {
-          ids.push(src.id)
-        })
-        return ids
-      }
-    },
-      name: 'App',
-      components: {
-      }
+    name: 'App',
+    components: {
     }
 ```
 
@@ -276,12 +268,13 @@ Then import this into app.js:
     } from './apilayers.js'
 ```
 
-17. In app.js below the "selected" property of the app instance we define an object to hold layer data once it has been loaded:
+17. In app.js below the "source" property of the app instance we define a 'layer' object to hold layer data once it has been loaded:
 
 ```
     data () {
       return {
-        selected: ''
+        sources: apisources,
+        source: ''
         layer: {}
       }
     },
@@ -292,7 +285,7 @@ Then a little further down, below "computed: { ... }," and above the name proper
 
 ```
     watch: {
-      selected (newSource, oldSource) {
+      source (newSource, oldSource) {
         if (oldSource) {
           this.$refs.map.map.setLayoutProperty(oldSource, 'visibility', 'none')
         }
@@ -421,7 +414,9 @@ Then at the end of the app.js file, add the following:
 
 Now if you test the app you should see a popup appear whenever the mouse hovers over a location in the selected layer.]
 
-21. 
+21. When the user clicks on a location in the map, we will show a pop-up panel where a listbox is to be provided for selection of a parameter, and a time series chart is displayed showing the data for selected parameter.
+
+
 
 
 

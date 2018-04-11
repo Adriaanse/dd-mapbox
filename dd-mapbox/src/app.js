@@ -13,21 +13,13 @@ import {
 export default {
   data () {
     return {
-      selected: '',
+      sources: apisources,
+      source: '',
       layer: {}
     }
   },
-  computed: {
-    selection: function () {
-      var ids = []
-      apisources.forEach((src) => {
-        ids.push(src.id)
-      })
-      return ids
-    }
-  },
   watch: {
-    selected (newSource, oldSource) {
+    source (newSource, oldSource) {
       if (oldSource) {
         this.map.setLayoutProperty(oldSource, 'visibility', 'none')
       }
@@ -37,7 +29,6 @@ export default {
         this.addLayer(newSource)
       }
     }
-
   },
   methods: {
     addLayer (id) {
