@@ -18,6 +18,11 @@
           <v-mapbox-geocoder></v-mapbox-geocoder>
           <v-mapbox-navigation-control></v-mapbox-navigation-control>
         </v-mapbox>
+        <v-card id="data-card" v-show="location">
+          <v-card-title>{{'Location: ' + location.name + ' (' + location.code + ')'}}</v-card-title>
+          <v-card-text></v-card-text>
+          <v-card-actions><v-btn flat @click="location=''">Close</v-btn></v-card-actions>
+        </v-card>
       </v-content>
       <v-footer app></v-footer>
     </v-app>
@@ -28,8 +33,18 @@
 <style >
   @import 'mapbox-gl/dist/mapbox-gl.css';
   @import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+  
   #map {
-  height: 100%;
-  width: 100%;
+    height: 100%;
+    width: 100%;
   }
+
+  #data-card {
+    position: absolute;
+    top: 80px;
+    left: 10px;
+    height: 50%;
+    width: 50%;
+  }
+
 </style>

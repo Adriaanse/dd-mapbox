@@ -15,6 +15,7 @@ export default {
     return {
       sources: apisources,
       source: '',
+      location: '',
       layer: {}
     }
   },
@@ -41,7 +42,7 @@ export default {
         layer.source = parseLayerData(data.results)
         this.layer[id] = layer
         this.map.addLayer(layer)
-        setupLayerEvents(this.map, layer)
+        setupLayerEvents(this, this.map, layer)
       })
       .catch(function (err) {
         console.log('error loading data: ' + err)
@@ -60,6 +61,28 @@ export default {
       })
     })
   }
+}
+
+function setupLayerEvents (self, map, layer) {
+  // when the mouse enters a feature of a layer
+  map.on('mouseenter', layer.id, (e) => {
+    // change cursor to a pointer and show popup with information
+    map.getCanvas().style.cursor = 'pointer'
+    map.popup.setLngLat(e.lngLat)
+      .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
+      .addTo(map)
+  })
+  // when mouse leaves a layer
+  map.on('mouseleave', layer.id, () => {
+    // cursors changes back to default and popup is removed
+    map.getCanvas().style.cursor = ''
+    map.popup.remove()
+  })
+  // when a location in the map is clicked
+  map.on('click', layer.id, (e) => {
+    // trigger the location popup
+    self.location = e.features[0].properties
+  })
 }
 
 function parseLayerData (apidata) {
@@ -86,21 +109,4 @@ function parseLayerData (apidata) {
     }
   }
   return source
-}
-
-function setupLayerEvents (map, layer) {
-  // when the mouse enters a feature of a layer
-  map.on('mouseenter', layer.id, (e) => {
-    // change cursor to a pointer and show popup with information
-    map.getCanvas().style.cursor = 'pointer'
-    map.popup.setLngLat(e.lngLat)
-      .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
-      .addTo(map)
-  })
-  // when mouse leaves a layer
-  map.on('mouseleave', layer.id, () => {
-    // cursors changes back to default and popup is removed
-    map.getCanvas().style.cursor = ''
-    map.popup.remove()
-  })
 }

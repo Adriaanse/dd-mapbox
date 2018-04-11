@@ -416,7 +416,60 @@ Now if you test the app you should see a popup appear whenever the mouse hovers 
 
 21. When the user clicks on a location in the map, we will show a pop-up panel where a listbox is to be provided for selection of a parameter, and a time series chart is displayed showing the data for selected parameter.
 
+In app.js, start with adding a "location" property which initially is empty, as follows:
 
+```
+    data () {
+      return {
+        sources: apisources,
+        source: '',
+        location: '',
+        layer: {}
+      }
+    },
+```
 
+Then where the setupLayerEvents() method is called, add 'this' as an argument, as follows:
 
+```
+    setupLayerEvents(this, this.map, layer)
+```
+
+Then in the setupLayerEvents method, add a MapBox click event handler, so the method becomes as follows:
+
+```
+    function setupLayerEvents (self, map, layer) {
+      // when the mouse enters a feature of a layer
+      map.on('mouseenter', layer.id, (e) => {
+        // change cursor to a pointer and show popup with information
+        map.getCanvas().style.cursor = 'pointer'
+        map.popup.setLngLat(e.lngLat)
+          .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
+          .addTo(map)
+      })
+      // when mouse leaves a layer
+      map.on('mouseleave', layer.id, () => {
+        // cursors changes back to default and popup is removed
+        map.getCanvas().style.cursor = ''
+        map.popup.remove()
+      })
+      // when a location in the map is clicked
+      map.on('click', layer.id, (e) => {
+        // trigger the location popup
+        self.location = e.features[0].properties
+      })
+    }
+```
+
+Now to create the popup, in the App.vue markup, just below the v-mapbox closing tag, add the following:
+
+```
+    <v-card id="data-card" v-show="location">
+      <v-card-title>{{'Location: ' + location.name + ' (' + location.code + ')'}}</v-card-title>
+      <v-card-text></v-card-text>
+      <v-card-actions><v-btn flat @click="location=''">Close</v-btn></v-card-actions>
+    </v-card>
+```
+
+Now if you test the application, selecting a location sets this.location which triggers the v-card popup to show, and clicking the close button clear the this.location property which will make the popup disappear.
 
