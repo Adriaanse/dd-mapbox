@@ -1,11 +1,13 @@
 const apisources = [
   {
-    'id': 'aquadesk',
-    'baseurl': 'http://digitaldelta.aquadesk.nl'
+    id: 'aquadesk',
+    baseUrl: 'http://digitaldelta.aquadesk.nl',
+    searchTerm: 'locationCode'
   },
   {
-    'id': 'lizard',
-    'baseurl': 'https://hhnk.lizard.net/dd/api/v1'
+    id: 'lizard',
+    baseUrl: 'https://hhnk.lizard.net/dd/api/v1',
+    searchTerm: 'locationCode'
   }]
 
 export {

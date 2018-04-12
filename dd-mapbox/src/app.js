@@ -9,43 +9,79 @@ import {
   apilayers
 } from './apilayers.js'
 
+// module scope variables
+var app
+var map
+
 // app instance
 export default {
   data () {
     return {
       sources: apisources,
       source: '',
+      parameters: [],
+      parameter: '',
       location: '',
-      layer: {}
+      layer: {},
+      wait: false
     }
   },
   watch: {
     source (newSource, oldSource) {
       if (oldSource) {
-        this.map.setLayoutProperty(oldSource, 'visibility', 'none')
+        map.setLayoutProperty(oldSource, 'visibility', 'none')
       }
       if (this.layer[newSource]) {
-        this.map.setLayoutProperty(newSource, 'visibility', 'visible')
+        map.setLayoutProperty(newSource, 'visibility', 'visible')
       } else {
-        this.addLayer(newSource)
+        app.addLayer(newSource)
       }
     }
   },
   methods: {
-    addLayer (id) {
+    setCursor (cursor) {
+      if (!app.wait) map.getCanvas().style.cursor = cursor
+    },
+    addLayer (source) {
       // load api data and add it as layer to the map
-      var url = apisources.find(s => s.id === id).baseurl
+      app.setCursor('wait')
+      app.wait = true
+      var url = apisources.find(s => s.id === source).baseUrl
       fetch(url + '/locations?format=json&pagesize=1000000')
       .then((resp) => resp.json())
       .then((data) => {
-        var layer = apilayers.find(l => l.id === id)
+        var layer = apilayers.find(l => l.id === source)
         layer.source = parseLayerData(data.results)
-        this.layer[id] = layer
-        this.map.addLayer(layer)
-        setupLayerEvents(this, this.map, layer)
+        app.layer[source] = layer
+        map.addLayer(layer)
+        setupLayerEvents(layer)
+        app.wait = false
+        app.setCursor('')
       })
       .catch(function (err) {
         console.log('error loading data: ' + err)
+        app.wait = false
+        app.setCursor('')
+      })
+    },
+    openLocation (location) {
+      // open data popup for selected location
+      app.setCursor('wait')
+      app.wait = true
+      app.location = location
+      var api = apisources.find(s => s.id === this.source)
+      fetch(api.baseUrl + '/timeseries?' + api.searchTerm + '=' + location.code + '&pagesize=10000')
+      .then((resp) => resp.json())
+      .then((data) => {
+        app.parameters = parseParameters(data.results)
+        app.wait = false
+        app.setCursor('')
+      })
+      .catch(function (err) {
+        console.log('error loading data: ' + err)
+        app.parameters = parseParameters([])
+        app.wait = false
+        app.setCursor('')
       })
     }
   },
@@ -53,21 +89,24 @@ export default {
   components: {
   },
   mounted () {
-    this.$nextTick(() => {
-      this.map = this.$refs.map.map
+    // app at module scope
+    app = this
+    // wait for vue to load
+    app.$nextTick(() => {
+      map = app.$refs.map.map
       // MapBox popup, for later use
-      this.map.popup = new mapboxgl.Popup({
+      map.popup = new mapboxgl.Popup({
         closeButton: false
       })
     })
   }
 }
 
-function setupLayerEvents (self, map, layer) {
+function setupLayerEvents (layer) {
   // when the mouse enters a feature of a layer
   map.on('mouseenter', layer.id, (e) => {
     // change cursor to a pointer and show popup with information
-    map.getCanvas().style.cursor = 'pointer'
+    app.setCursor('pointer')
     map.popup.setLngLat(e.lngLat)
       .setHTML('Location: ' + e.features[0].properties.name + ' (Code: ' + e.features[0].properties.code + ')')
       .addTo(map)
@@ -75,13 +114,13 @@ function setupLayerEvents (self, map, layer) {
   // when mouse leaves a layer
   map.on('mouseleave', layer.id, () => {
     // cursors changes back to default and popup is removed
-    map.getCanvas().style.cursor = ''
+    app.setCursor('')
     map.popup.remove()
   })
   // when a location in the map is clicked
   map.on('click', layer.id, (e) => {
-    // trigger the location popup
-    self.location = e.features[0].properties
+    // open the location popup
+    app.openLocation(e.features[0].properties)
   })
 }
 
@@ -109,4 +148,27 @@ function parseLayerData (apidata) {
     }
   }
   return source
+}
+
+function parseParameters (apidata) {
+  // extract list of available parameters (observationtypes) from api data
+  var params = []
+  apidata.forEach(data => {
+    var ot = data.observationType
+    if (!params.find(p => p.uuid === ot.uuid)) {
+      ot.name = ot.quantity + ' (' + ot.parameterCode + ')'
+      params.push(ot)
+    }
+  })
+  if (params.length === 0) {
+    params.push({
+      uuid: '',
+      name: 'No data available'
+    })
+  }
+  // sort by name
+  params.sort((a, b) => {
+    return (a.name > b.name) ? 1 : (a.name < b.name) ? -1 : 0
+  })
+  return params
 }

@@ -181,12 +181,14 @@ You should now see a search field in the upper right corner of the map where you
 ```
     const apisources = [
       {
-        'id': 'aquadesk',
-        'baseurl': 'http://digitaldelta.aquadesk.nl'
+        id: 'aquadesk',
+        baseUrl: 'http://digitaldelta.aquadesk.nl',
+        searchTerm: 'locationCode'
       },
       {
-        'id': 'lizard',
-        'baseurl': 'https://hhnk.lizard.net/dd/api/v1'
+        id: 'lizard',
+        baseUrl: 'https://hhnk.lizard.net/dd/api/v1',
+        searchTerm: 'locationCode'
       }]
 
     export {
@@ -198,7 +200,7 @@ You should now see a search field in the upper right corner of the map where you
 ```
     <v-toolbar app>
       <v-flex xs4 pt-4 pl-2>
-        <v-select name="sourceselect" v-model="source" v-bind:items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
+        <v-select v-model="source" v-bind:items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
       </v-flex>
     </v-toolbar>
 ```
@@ -298,8 +300,8 @@ Then a little further down, below "computed: { ... }," and above the name proper
 
     },
     methods: {
-      addLayer (id) {
-        console.log('todo: add layer: ' + id)
+      addLayer (source) {
+        console.log('todo: add layer: ' + source)
       }
     },
 ```
@@ -309,19 +311,22 @@ You should now see the "todo:" message in the javascript console when selecting 
 
 ```
     methods: {
-      addLayer (id) {
+      addLayer (source) {
         // load api data and add it as layer to the map
-        var url = apisources.find(s => s.id === id).baseurl
+        this.map.getCanvas().style.cursor = 'wait'
+        var url = apisources.find(s => s.id === source).baseUrl
         fetch(url + '/locations?pagesize=100000')
         .then((resp) => resp.json())
         .then((data) => {
-          var layer = apilayers.find(l => l.id === id)
+          var layer = apilayers.find(l => l.id === source)
           layer.source = parseLayerData(data.results)
-          this.layer[id] = layer
+          this.layer[source] = layer
           this.map.addLayer(layer)
+          this.map.getCanvas().style.cursor = ''
         })
         .catch(function (err) {
           console.log('error loading data: ' + err)
+          this.map.getCanvas().style.cursor = ''
         })
       }
     },
@@ -471,5 +476,6 @@ Now to create the popup, in the App.vue markup, just below the v-mapbox closing 
     </v-card>
 ```
 
-Now if you test the application, selecting a location sets this.location which triggers the v-card popup to show, and clicking the close button clear the this.location property which will make the popup disappear.
+Now if you test the application, selecting a location sets this.location which triggers the v-card popup to show, and clicking the close button clears the this.location property which will make the popup disappear.
 
+22. In the popup
