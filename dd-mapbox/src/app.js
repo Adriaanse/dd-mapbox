@@ -19,9 +19,9 @@ export default {
     return {
       sources: apisources,
       source: '',
+      location: '',
       parameters: [],
       parameter: '',
-      location: '',
       layer: {},
       wait: false
     }
@@ -36,18 +36,26 @@ export default {
       } else {
         app.addLayer(newSource)
       }
+    },
+    parameter (newParameter, oldParameter) {
+      console.log(newParameter)
     }
   },
   methods: {
     setCursor (cursor) {
-      if (!app.wait) map.getCanvas().style.cursor = cursor
+      if (!app.wait) {
+        document.body.style.cursor = cursor
+        map.getCanvas().style.cursor = cursor
+      }
     },
     addLayer (source) {
       // load api data and add it as layer to the map
       app.setCursor('wait')
       app.wait = true
-      var url = apisources.find(s => s.id === source).baseUrl
-      fetch(url + '/locations?format=json&pagesize=1000000')
+      var api = apisources.find(s => s.id === source)
+      var url = api.baseUrl + '/locations'
+      if (api.options) url += '?' + api.options
+      fetch(url)
       .then((resp) => resp.json())
       .then((data) => {
         var layer = apilayers.find(l => l.id === source)
@@ -151,13 +159,20 @@ function parseLayerData (apidata) {
 }
 
 function parseParameters (apidata) {
-  // extract list of available parameters (observationtypes) from api data
+  // extract list of available series per observation type
   var params = []
   apidata.forEach(data => {
     var ot = data.observationType
-    if (!params.find(p => p.uuid === ot.uuid)) {
-      ot.name = ot.quantity + ' (' + ot.parameterCode + ')'
+    if (!ot.qualifier) {
+      ot.qualifier = ''
+    }
+    var p = params.find(p => p.uuid === ot.uuid)
+    if (!p) {
+      ot.name = ot.quantity + ' ' + ot.qualifier + ' (' + ot.parameterCode + ')'
+      ot.series = [ data.uuid ]
       params.push(ot)
+    } else {
+      p.series.push(data.uuid)
     }
   })
   if (params.length === 0) {
@@ -166,9 +181,13 @@ function parseParameters (apidata) {
       name: 'No data available'
     })
   }
+  // add series count per parameter
+  params.forEach((p) => {
+    p.name = p.name + ' x ' + p.series.length
+  })
   // sort by name
   params.sort((a, b) => {
-    return (a.name > b.name) ? 1 : (a.name < b.name) ? -1 : 0
+    return (a.parameterCode > b.parameterCode) ? 1 : (a.parameterCode < b.parameterCode) ? -1 : 0
   })
   return params
 }
