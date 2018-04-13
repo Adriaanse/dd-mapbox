@@ -6,7 +6,7 @@ const apisources = [
     options: 'pagesize=1000000'
   },
   {
-    id: 'lizard',
+    id: 'lizard (hhnk)',
     baseUrl: 'https://cors-anywhere.herokuapp.com/https://hhnk.lizard.net/dd/api/v1',
     searchTerm: 'locationCode',
     options: 'format=json&pagesize=1000000'

@@ -8,7 +8,7 @@ const apilayers = [
     }
   },
   {
-    'id': 'lizard',
+    'id': 'lizard (.*?)',
     'type': 'circle',
     'minzoom': 5,
     'paint': {

@@ -58,7 +58,7 @@ export default {
       fetch(url)
       .then((resp) => resp.json())
       .then((data) => {
-        var layer = apilayers.find(l => l.id === source)
+        var layer = apilayers.find(l => source.match(l.id))
         layer.source = parseLayerData(data.results)
         app.layer[source] = layer
         map.addLayer(layer)
