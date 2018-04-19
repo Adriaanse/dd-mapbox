@@ -2,10 +2,10 @@
     <v-app>
     <v-toolbar app>
       <v-flex xs4 pt-4 pl-2>
-        <v-select v-model="source" v-bind:items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
+        <v-select v-model="source" :items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
       </v-flex>
       <v-flex xs2 pt-4 pl-2>
-        <v-select v-model="year" v-bind:items="years" overflow label="Year"/>
+        <v-select v-model="year" :items="years" overflow label="Year"/>
       </v-flex>
     </v-toolbar>
       <v-content>
@@ -25,9 +25,11 @@
           <v-card-title>{{'Location: ' + location.name + ' (' + location.code + ')'}}</v-card-title>
           <v-card-text>
             <v-flex>
-              <v-select v-model="parameter" v-bind:items="parameters" item-text="name" item-value="uuid" overflow label="Parameters"/>
+              <v-select v-model="parameter" :items="parameters" item-text="name" item-value="uuid" overflow label="Parameters"/>
             </v-flex>
-            <v-flex id='data-chart'></v-flex>
+            <v-flex>
+
+            </v-flex>
           </v-card-text>
           <v-card-actions><v-btn flat @click="location=''">Close</v-btn></v-card-actions>
         </v-card>
@@ -55,4 +57,8 @@
     width: 50%;
   }
 
+  #data-chart {
+    width: 400;
+    height: 400;
+  }
 </style>

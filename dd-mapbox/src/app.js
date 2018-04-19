@@ -1,4 +1,4 @@
-// mapbox-gl
+// mapbox-gl API
 import mapboxgl from 'mapbox-gl'
 
 // api sources digitale delta
@@ -25,12 +25,14 @@ export default {
       location: '',
       parameters: [],
       parameter: '',
+      chartData: null,
       layer: {},
       wait: false
     }
   },
   watch: {
     source (newSource, oldSource) {
+      // load selected api source
       app.clearLocation()
       app.api = apisources.find(s => s.id === newSource)
       if (app.api.year) {
@@ -46,6 +48,7 @@ export default {
       }
     },
     parameter (newParameter, oldParameter) {
+      // load selected parameter
       app.loadParameter(app.parameters.find(p => p.uuid === newParameter))
     }
   },
@@ -71,6 +74,7 @@ export default {
         .then((resp) => resp.json())
         .then((data) => {
           var layer = apilayers.find(l => source.match(l.id))
+          layer.id = source
           layer.source = parseLayerData(data.results)
           app.layer[source] = layer
           map.addLayer(layer)
@@ -94,7 +98,6 @@ export default {
         .then((resp) => resp.json())
         .then((data) => {
           app.location = location
-          app.parameter = ''
           app.parameters = parseParameters(data.results)
           app.wait = false
           app.setCursor('')
@@ -119,7 +122,7 @@ export default {
         fetch(url)
           .then((resp) => resp.json())
           .then((data) => {
-            plotParameter(data, parameter, 'data-chart')
+            plotParameter(data, parameter)
             app.wait = false
             app.setCursor('')
           })
@@ -132,10 +135,9 @@ export default {
     }
   },
   name: 'App',
-  components: {
-  },
+  components: {},
   mounted () {
-    // app at module scope
+    // define app at module scope, for convenience
     app = this
 
     // years from 2010 to current
