@@ -22,9 +22,9 @@
           <v-card-title>{{'Location: ' + location.name + ' (' + location.code + ')'}}</v-card-title>
           <v-card-text>
             <v-flex>
-              <v-select v-model="parameter" v-bind:items="parameters" item-text="name" overflow label="Parameters"/>
+              <v-select v-model="parameter" v-bind:items="parameters" item-text="name" item-value="uuid" overflow label="Parameters"/>
             </v-flex>
-            <v-flex></v-flex>
+            <v-flex id='data-chart'></v-flex>
           </v-card-text>
           <v-card-actions><v-btn flat @click="location=''">Close</v-btn></v-card-actions>
         </v-card>
