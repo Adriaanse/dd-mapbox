@@ -4,6 +4,9 @@
       <v-flex xs4 pt-4 pl-2>
         <v-select v-model="source" v-bind:items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
       </v-flex>
+      <v-flex xs2 pt-4 pl-2>
+        <v-select v-model="year" v-bind:items="years" overflow label="Year"/>
+      </v-flex>
     </v-toolbar>
       <v-content>
         <v-mapbox 

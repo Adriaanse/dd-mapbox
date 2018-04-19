@@ -19,6 +19,9 @@ export default {
     return {
       sources: apisources,
       source: '',
+      api: null,
+      years: [],
+      year: 2018,
       location: '',
       parameters: [],
       parameter: '',
@@ -28,19 +31,22 @@ export default {
   },
   watch: {
     source (newSource, oldSource) {
-      this.parameter = ''
-      this.location = ''
-      if (oldSource && this.layer[oldSource]) {
+      app.clearLocation()
+      app.api = apisources.find(s => s.id === newSource)
+      if (app.api.year) {
+        app.year = app.api.year
+      }
+      if (oldSource && app.layer[oldSource]) {
         map.setLayoutProperty(oldSource, 'visibility', 'none')
       }
-      if (this.layer[newSource]) {
+      if (app.layer[newSource]) {
         map.setLayoutProperty(newSource, 'visibility', 'visible')
       } else {
         app.addLayer(newSource)
       }
     },
     parameter (newParameter, oldParameter) {
-      this.loadParameter(this.parameters.find(p => p.uuid === newParameter))
+      app.loadParameter(app.parameters.find(p => p.uuid === newParameter))
     }
   },
   methods: {
@@ -50,13 +56,17 @@ export default {
         map.getCanvas().style.cursor = cursor
       }
     },
+    clearLocation () {
+      app.location = ''
+      app.parameter = ''
+      app.parameters = []
+    },
     addLayer (source) {
       // load api data and add it as layer to the map
       app.setCursor('wait')
       app.wait = true
-      var api = apisources.find(s => s.id === source)
-      var url = `${api.baseUrl}/locations`
-      if (api.locationsParameters) url += '?' + api.locationsParameters
+      var url = `${app.api.baseUrl}/locations`
+      if (app.api.locationsParameters) url += '?' + app.api.locationsParameters
       fetch(url)
         .then((resp) => resp.json())
         .then((data) => {
@@ -78,9 +88,8 @@ export default {
       // open data popup for selected location
       app.setCursor('wait')
       app.wait = true
-      var api = apisources.find(s => s.id === this.source)
-      var url = `${api.baseUrl}/timeseries?${api.searchTerm}=${location.code}`
-      if (api.seriesParameters) url += '&' + api.seriesParameters
+      var url = `${app.api.baseUrl}/timeseries?${app.api.searchTerm}=${location.code}`
+      if (app.api.seriesParameters) url += '&' + app.api.seriesParameters
       fetch(url)
         .then((resp) => resp.json())
         .then((data) => {
@@ -92,8 +101,7 @@ export default {
         })
         .catch((err) => {
           alert('Error loading data: ' + err)
-          app.location = ''
-          app.parameters = parseParameters([])
+          app.clearLocation()
           app.wait = false
           app.setCursor('')
         })
@@ -101,17 +109,24 @@ export default {
     loadParameter (parameter) {
       // for now load only the first series for selected observation type
       if (parameter && parameter.series && parameter.series.length > 0) {
-        var api = apisources.find(s => s.id === this.source)
+        app.setCursor('wait')
+        app.wait = true
         var series = parameter.series[0]
-        var url = `${api.baseUrl}/timeseries/${series.uuid}/data?start=${series.start}&end=${series.end}`
-        if (api.dataParameters) url += '&' + api.dataParameters
+        var start = (app.year) ? `${app.year}-01-01T00:00:00Z` : series.start
+        var end = (app.year) ? `${app.year}-12-31T23:59:59Z` : series.end
+        var url = `${app.api.baseUrl}/timeseries/${series.uuid}/data?start=${start}&end=${end}`
+        if (app.api.dataParameters) url += '&' + app.api.dataParameters
         fetch(url)
           .then((resp) => resp.json())
           .then((data) => {
             plotParameter(data, parameter, 'data-chart')
+            app.wait = false
+            app.setCursor('')
           })
           .catch((err) => {
             alert('error loading data: ' + err)
+            app.wait = false
+            app.setCursor('')
           })
       }
     }
@@ -122,6 +137,12 @@ export default {
   mounted () {
     // app at module scope
     app = this
+
+    // years from 2010 to current
+    for (var year = new Date().getFullYear(); year >= 2009; year--) {
+      app.years.push(year)
+    }
+
     // wait for vue to load
     app.$nextTick(() => {
       map = app.$refs.map.map
@@ -219,13 +240,15 @@ function parseParameters (apidata) {
 function plotParameter (data, parameter, elementId) {
   // create time series chart and insert in element with given id
   var xy = []
+  // limit to last 1000 points ?
+  if (data.length > 1000) data = data.slice(data.length - 1000)
   data.forEach((event) => {
     var date = null
     // be ware of timestamp field name inconsistency !
     if (event.timeStamp) {
       date = new Date(event.timeStamp)
-    } else if (event.timestep) {
-      date = new Date(event.timeStamp)
+    } else if (event.timestamp) {
+      date = new Date(event.timestamp)
     }
     if (date && event.value) {
       xy.push({

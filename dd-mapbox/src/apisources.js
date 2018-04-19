@@ -4,15 +4,17 @@ const apisources = [
     baseUrl: 'http://digitaldelta.aquadesk.nl',
     searchTerm: 'locationCode',
     locationsParameters: 'pagesize=10000',
-    seriesParameters: 'pagesize=100'
+    seriesParameters: 'pagesize=100',
+    year: 2009
   },
   {
     id: 'lizard (hhnk)',
     baseUrl: 'https://cors-anywhere.herokuapp.com/https://hhnk.lizard.net/dd/api/v1',
     searchTerm: 'locationCode',
-    locationsParameters: 'format=json&pagesize=1000000',
+    locationsParameters: 'format=json&pagesize=100',
     seriesParameters: 'format=json',
-    dataParameters: 'format=json'
+    dataParameters: 'format=json',
+    year: 2018
   },
   {
     id: 'fews',
