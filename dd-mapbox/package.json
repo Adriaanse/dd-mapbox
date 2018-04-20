@@ -13,6 +13,7 @@
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^2.2.0",
     "babel-polyfill": "^6.26.0",
+    "chart.js": "^2.7.2",
     "vue": "^2.5.2",
     "vue2mapbox-gl": "^0.3.2",
     "vuetify": "^1.0.16"
@@ -40,6 +41,7 @@
     "eslint-plugin-node": "^5.2.0",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-vue": "^4.5.0",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^1.1.4",
     "friendly-errors-webpack-plugin": "^1.7.0",

@@ -1,6 +1,9 @@
 // mapbox-gl API
 import mapboxgl from 'mapbox-gl'
 
+// custom chartjs component
+import SeriesChart from './components/SeriesChart'
+
 // api sources digitale delta
 import {
   apisources
@@ -25,7 +28,7 @@ export default {
       location: '',
       parameters: [],
       parameter: '',
-      chartData: null,
+      seriesData: null,
       layer: {},
       wait: false
     }
@@ -44,7 +47,7 @@ export default {
       if (app.layer[newSource]) {
         map.setLayoutProperty(newSource, 'visibility', 'visible')
       } else {
-        app.addLayer(newSource)
+        app.loadLocations(newSource)
       }
     },
     parameter (newParameter, oldParameter) {
@@ -64,7 +67,7 @@ export default {
       app.parameter = ''
       app.parameters = []
     },
-    addLayer (source) {
+    loadLocations (id) {
       // load api data and add it as layer to the map
       app.setCursor('wait')
       app.wait = true
@@ -73,10 +76,10 @@ export default {
       fetch(url)
         .then((resp) => resp.json())
         .then((data) => {
-          var layer = apilayers.find(l => source.match(l.id))
-          layer.id = source
+          var layer = Object.assign({}, apilayers.find(l => id.match(l.id)))
+          layer.id = id
           layer.source = parseLayerData(data.results)
-          app.layer[source] = layer
+          app.layer[id] = layer
           map.addLayer(layer)
           setupLayerEvents(layer)
           app.wait = false
@@ -135,7 +138,9 @@ export default {
     }
   },
   name: 'App',
-  components: {},
+  components: {
+    'series-chart': SeriesChart
+  },
   mounted () {
     // define app at module scope, for convenience
     app = this
@@ -182,16 +187,18 @@ function parseLayerData (apidata) {
   // re-format the api data to geojson
   var geojsonarray = []
   apidata.forEach((item) => {
-    geojsonarray.push({
-      'type': 'Feature',
-      'geometry': item.geometry,
-      'properties': {
-        'uuid': item.uuid,
-        'url': item.url,
-        'code': item.code,
-        'name': item.name
-      }
-    })
+    if (item.geometry) {
+      geojsonarray.push({
+        'type': 'Feature',
+        'geometry': item.geometry,
+        'properties': {
+          'uuid': item.uuid,
+          'url': item.url,
+          'code': item.code,
+          'name': item.name
+        }
+      })
+    }
   })
   // MapBox data source format
   var source = {
@@ -205,7 +212,7 @@ function parseLayerData (apidata) {
 }
 
 function parseParameters (apidata) {
-  // extract list of available series per observation type
+  // extract list of available series, gouped per observation type
   var params = []
   apidata.forEach(data => {
     var ot = data.observationType
@@ -259,4 +266,5 @@ function plotParameter (data, parameter, elementId) {
       })
     }
   })
+  app.seriesData = xy
 }

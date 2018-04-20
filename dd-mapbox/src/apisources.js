@@ -11,7 +11,7 @@ const apisources = [
     id: 'flevoland (lizard)',
     baseUrl: 'https://cors-anywhere.herokuapp.com/https://flevoland.lizard.net/dd/api/v1',
     searchTerm: 'locationCode',
-    locationsParameters: 'format=json&pagesize=100',
+    locationsParameters: 'format=json&pagesize=1000',
     seriesParameters: 'format=json',
     dataParameters: 'format=json',
     year: 2018
@@ -20,7 +20,7 @@ const apisources = [
     id: 'HDSR (lizard)',
     baseUrl: 'https://cors-anywhere.herokuapp.com/https://hdsr.lizard.net/dd/api/v1',
     searchTerm: 'locationCode',
-    locationsParameters: 'format=json&pagesize=100',
+    locationsParameters: 'format=json&pagesize=1000',
     seriesParameters: 'format=json',
     dataParameters: 'format=json',
     year: 2018
@@ -29,7 +29,7 @@ const apisources = [
     id: 'HHNK (lizard)',
     baseUrl: 'https://cors-anywhere.herokuapp.com/https://hhnk.lizard.net/dd/api/v1',
     searchTerm: 'locationCode',
-    locationsParameters: 'format=json&pagesize=100',
+    locationsParameters: 'format=json&pagesize=1000',
     seriesParameters: 'format=json',
     dataParameters: 'format=json',
     year: 2018
@@ -38,7 +38,7 @@ const apisources = [
     id: 'WDODelta (lizard)',
     baseUrl: 'https://cors-anywhere.herokuapp.com/https://wdodelta.lizard.net/dd/api/v1',
     searchTerm: 'locationCode',
-    locationsParameters: 'format=json&pagesize=100',
+    locationsParameters: 'format=json&pagesize=1000',
     seriesParameters: 'format=json',
     dataParameters: 'format=json',
     year: 2018
@@ -47,7 +47,7 @@ const apisources = [
     id: 'Vitens (lizard)',
     baseUrl: 'https://cors-anywhere.herokuapp.com/https://vitens.lizard.net/dd/api/v1',
     searchTerm: 'locationCode',
-    locationsParameters: 'format=json&pagesize=100',
+    locationsParameters: 'format=json&pagesize=1000',
     seriesParameters: 'format=json',
     dataParameters: 'format=json',
     year: 2018

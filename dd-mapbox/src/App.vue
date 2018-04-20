@@ -1,41 +1,41 @@
 <template>
-    <v-app>
-    <v-toolbar app>
-      <v-flex xs4 pt-4 pl-2>
-        <v-select v-model="source" :items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
-      </v-flex>
-      <v-flex xs2 pt-4 pl-2>
-        <v-select v-model="year" :items="years" overflow label="Year"/>
-      </v-flex>
-    </v-toolbar>
-      <v-content>
-        <v-mapbox 
-          access-token="pk.eyJ1IjoiYWRyaWFhbnNlIiwiYSI6ImNqYXd4YnZ5dzc4dzMycW53b3lhMXZ6eDkifQ.bbG-PKhVspm-Mkh9zhO8hQ"
-          map-style="mapbox://styles/mapbox/light-v9"
-          :center="[5.5, 52.078]"
-          :zoom="6.5"
-          :pitch="0"
-          :bearing="0"
-          id="map"
-          ref="map">
-          <v-mapbox-geocoder></v-mapbox-geocoder>
-          <v-mapbox-navigation-control></v-mapbox-navigation-control>
-        </v-mapbox>
-        <v-card id="data-card" v-show="location">
-          <v-card-title>{{'Location: ' + location.name + ' (' + location.code + ')'}}</v-card-title>
-          <v-card-text>
-            <v-flex>
-              <v-select v-model="parameter" :items="parameters" item-text="name" item-value="uuid" overflow label="Parameters"/>
-            </v-flex>
-            <v-flex>
-
-            </v-flex>
-          </v-card-text>
-          <v-card-actions><v-btn flat @click="location=''">Close</v-btn></v-card-actions>
-        </v-card>
-      </v-content>
-      <v-footer app></v-footer>
-    </v-app>
+  <v-app>
+  <v-toolbar app>
+    <v-flex xs4 pt-4 pl-2>
+      <v-select v-model="source" :items="sources" item-text="id" item-value="id" overflow label="Digital Delta Nodes"/>
+    </v-flex>
+    <v-flex xs2 pt-4 pl-2>
+      <v-select v-model="year" :items="years" overflow label="Year"/>
+    </v-flex>
+  </v-toolbar>
+    <v-content>
+      <v-mapbox 
+        access-token="pk.eyJ1IjoiYWRyaWFhbnNlIiwiYSI6ImNqYXd4YnZ5dzc4dzMycW53b3lhMXZ6eDkifQ.bbG-PKhVspm-Mkh9zhO8hQ"
+        map-style="mapbox://styles/mapbox/light-v9"
+        :center="[5.5, 52.078]"
+        :zoom="6.5"
+        :pitch="0"
+        :bearing="0"
+        id="map"
+        ref="map">
+        <v-mapbox-geocoder></v-mapbox-geocoder>
+        <v-mapbox-navigation-control></v-mapbox-navigation-control>
+      </v-mapbox>
+      <v-card id="data-card" v-show="location">
+        <v-card-title>{{'Location: ' + location.name + ' (' + location.code + ')'}}</v-card-title>
+        <v-card-text>
+          <v-flex>
+            <v-select v-model="parameter" :items="parameters" item-text="name" item-value="uuid" overflow label="Parameters"/>
+          </v-flex>
+          <v-flex>
+            <series-chart id="data-chart" :data="seriesData"></series-chart>
+          </v-flex>
+        </v-card-text>
+        <v-card-actions><v-btn flat @click="location=''">Close</v-btn></v-card-actions>
+      </v-card>
+    </v-content>
+    <v-footer app></v-footer>
+  </v-app>
 </template>
 
 <script src="./app.js"></script>
