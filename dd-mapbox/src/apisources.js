@@ -3,7 +3,7 @@ const apisources = [
     id: 'aquadesk',
     baseUrl: 'http://digitaldelta.aquadesk.nl',
     locationsParameters: 'pagesize=10000',
-    seriesParameters: 'pagesize=100'
+    seriesParameters: 'pagesize=10000'
   },
   {
     id: 'flevoland (lizard)',

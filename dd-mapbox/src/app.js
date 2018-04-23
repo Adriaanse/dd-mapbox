@@ -1,5 +1,7 @@
 // mapbox-gl API
 import mapboxgl from 'mapbox-gl'
+
+// momentjs for date processing
 import moment from 'moment'
 
 // custom chartjs component
@@ -62,6 +64,7 @@ export default {
       app.location = ''
       app.parameter = ''
       app.parameters = []
+      app.seriesData = null
     },
     loadLocations (id) {
       // load api data and add it as layer to the map
@@ -205,7 +208,7 @@ function parseLayerData (apidata) {
 }
 
 function parseParameters (apidata) {
-  // extract list of available series, gouped per observation type
+  // extract list of available series, grouped per observation type
   var params = []
   apidata.forEach(data => {
     var ot = data.observationType
@@ -230,7 +233,9 @@ function parseParameters (apidata) {
   }
   // add series count per parameter
   params.forEach((p) => {
-    p.name = p.name + ' x ' + p.series.length
+    if (p.series && p.series.length) {
+      p.name = p.name + ' x ' + p.series.length
+    }
   })
   // sort by name
   params.sort((a, b) => {
@@ -243,18 +248,17 @@ function plotParameter (data, parameter, elementId) {
   // create time series chart and insert in element with given id
   var xy = []
   // limit to last 1000 points ?
-  if (data.length > 1000) data = data.slice(data.length - 1000)
   data.forEach((event) => {
     var date = null
     // be ware of timestamp field name inconsistency !
     if (event.timeStamp) {
-      date = new Date(event.timeStamp)
+      date = moment(event.timeStamp)
     } else if (event.timestamp) {
-      date = new Date(event.timestamp)
+      date = moment(event.timestamp)
     }
-    if (date && event.value) {
+    if (date != null) {
       xy.push({
-        x: date,
+        x: date.toDate(),
         y: event.value
       })
     }

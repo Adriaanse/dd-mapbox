@@ -28,7 +28,7 @@
             <series-chart id="data-chart" :data="seriesData"></series-chart>
           </v-flex>
         </v-card-text>
-        <v-card-actions><v-btn flat @click="location=''">Close</v-btn></v-card-actions>
+        <v-card-actions><v-btn flat @click='clearLocation()'>Close</v-btn></v-card-actions>
       </v-card>
     </v-content>
     <v-footer app></v-footer>

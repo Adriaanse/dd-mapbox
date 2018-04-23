@@ -1,3 +1,6 @@
+// note: ChartJS requires MomentJS for time-axes suppoert
+// eslint-disable-next-line no-unused-vars
+import moment from 'moment'
 import Chart from 'chart.js'
 
 export default {
@@ -6,10 +9,18 @@ export default {
       canvas: null,
       chart: null,
       options: {
+        animation: false,
         scales: {
-          xaxes: [{
+          xAxes: [{
+            display: true,
             type: 'time',
-            display: true
+            time: {
+              displayFormats: {
+                month: 'D MMM',
+                week: 'D'
+              },
+              tooltipFormat: 'HH:mm DD/MM/YY'
+            }
           }]
         }
       }
@@ -28,7 +39,10 @@ export default {
         type: 'line',
         data: {
           labels: [],
-          datasets: [{ data: this.data }]
+          datasets: [{
+            fill: false,
+            data: this.data
+          }]
         },
         options: this.options
       })
