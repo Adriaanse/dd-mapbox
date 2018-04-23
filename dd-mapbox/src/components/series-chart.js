@@ -10,6 +10,9 @@ export default {
       chart: null,
       options: {
         animation: false,
+        legend: {
+          display: false
+        },
         scales: {
           xAxes: [{
             display: true,
@@ -35,17 +38,19 @@ export default {
   methods: {
     loadChartJS () {
       if (this.chart) this.chart.destroy()
-      this.chart = new Chart(this.canvas, {
-        type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            fill: false,
-            data: this.data
-          }]
-        },
-        options: this.options
-      })
+      if (this.data) {
+        this.chart = new Chart(this.canvas, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [{
+              fill: false,
+              data: this.data
+            }]
+          },
+          options: this.options
+        })
+      }
     }
   },
   mounted () {

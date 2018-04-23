@@ -50,7 +50,7 @@ export default {
     },
     parameter (newParameter, oldParameter) {
       // load selected parameter
-      app.loadParameter(app.parameters.find(p => p.uuid === newParameter))
+      if (newParameter) app.loadParameter(app.parameters.find(p => p.uuid === newParameter))
     }
   },
   methods: {
@@ -62,12 +62,11 @@ export default {
     },
     clearLocation () {
       app.location = ''
-      app.parameter = ''
       app.parameters = []
       app.seriesData = null
     },
     loadLocations (id) {
-      // load api data and add it as layer to the map
+      // load api locations and add it as layer to the map
       app.setCursor('wait')
       app.wait = true
       var url = `${app.api.baseUrl}/locations`
@@ -92,6 +91,7 @@ export default {
     },
     openLocation (location) {
       // open data popup for selected location
+      app.clearLocation()
       app.setCursor('wait')
       app.wait = true
       var url = `${app.api.baseUrl}/timeseries?locationCode=${location.code}`
@@ -101,8 +101,19 @@ export default {
         .then((data) => {
           app.location = location
           app.parameters = parseParameters(data.results)
-          app.wait = false
-          app.setCursor('')
+          // select default parameter ?
+          if (app.parameters.length === 1) {
+            app.parameter = app.parameters[0]
+          }
+          if (!app.parameters.includes(app.parameter)) {
+            app.parameter = ''
+          }
+          if (app.parameter) {
+            app.loadParameter(app.parameter)
+          } else {
+            app.wait = false
+            app.setCursor('')
+          }
         })
         .catch((err) => {
           alert('Error loading data: ' + err)
@@ -116,11 +127,13 @@ export default {
       if (parameter && parameter.series && parameter.series.length > 0) {
         app.setCursor('wait')
         app.wait = true
+
+        // load only the last 2 months of data for the first series
         var series = parameter.series[0]
-        // load the last 2 months of data
         var end = (!series.end) ? moment() : moment(series.end, 'YYYY-MM-DDTHH:mm:ss.SSSSZ')
         var start = moment(end).subtract(2, 'M')
 
+        // load data
         var url = `${app.api.baseUrl}/timeseries/${series.uuid}/data?start=${start.utc().format()}&end=${end.utc().format()}`
         if (app.api.dataParameters) url += '&' + app.api.dataParameters
         fetch(url)
@@ -233,7 +246,7 @@ function parseParameters (apidata) {
   }
   // add series count per parameter
   params.forEach((p) => {
-    if (p.series && p.series.length) {
+    if (p.series && p.series.length > 1) {
       p.name = p.name + ' x ' + p.series.length
     }
   })
